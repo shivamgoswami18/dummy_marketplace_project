@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { commonLabels, getItem } from "@/components/constants/Common";
 import { getDefaultPublicRoute } from "@/lib/config/routesConfig";
@@ -14,25 +14,16 @@ export default function PrivateRouteGuard({
 }: PrivateRouteGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
     const token = getItem(commonLabels.token);
 
     if (!token) {
       router.replace(getDefaultPublicRoute());
-      setIsAuthenticated(false);
-    } else {
-      setIsAuthenticated(true);
     }
   }, [router, pathname]);
 
-  // During SSR and initial client render, return null to prevent hydration mismatch
-  if (isAuthenticated === null) {
-    return null;
-  }
-
-  if (!isAuthenticated) {
+  if (!getItem(commonLabels.token)) {
     return null;
   }
 
